@@ -4,9 +4,9 @@ function TaskDetail() {
     const {id} = useParams();
     return (
         <div>
-            <h1>Chi tiết công việc</h1>
+            <h1>Jobs detail</h1>
 
-            <p>ID công việc: {id}</p>
+            <p>ID job: {id}</p>
         </div>
     )
 }

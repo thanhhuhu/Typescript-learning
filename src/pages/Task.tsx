@@ -1,135 +1,82 @@
 import {
-  useEffect,
   useMemo,
   useState,
 } from "react";
 
 import TaskList from "../components/task/TaskList";
+import TaskForm from "../components/task/TaskForm";
 
 import type {
   Task,
   TaskStatus,
 } from "../types/task";
 
+import useTasks from "../hooks/useTasks";
+
 function Tasks() {
-  // ========================================
-  // STATE
-  // ========================================
-  
-  // Lấy dữ liệu Task từ LocalStorage khi component được khởi tạo
-  const [tasks, setTasks] = useState<Task[]>(() => {
-    const savedTasks = localStorage.getItem("tasks");
+  const {
+    tasks,
+    addTask,
+    deleteTask,
+    updateTask,
+  } = useTasks();
 
-    return savedTasks
-      ? JSON.parse(savedTasks)
-      : [];
-  });
+  // Task đang được sửa
+  const [editingTask, setEditingTask] =
+    useState<Task | null>(null);
 
-  // Từ khóa tìm kiếm
   const [search, setSearch] = useState("");
 
-  // Bộ lọc trạng thái
   const [statusFilter, setStatusFilter] =
     useState<TaskStatus | "all">("all");
 
-
   // ========================================
-  // LOCAL STORAGE
-  // ========================================
-
-  // Mỗi khi tasks thay đổi → lưu vào LocalStorage
-  useEffect(() => {
-    localStorage.setItem(
-      "tasks",
-      JSON.stringify(tasks)
-    );
-  }, [tasks]);
-
-
-  // ========================================
-  // SEARCH + FILTER + useMemo
+  // SEARCH + FILTER
   // ========================================
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-
-      // Kiểm tra tìm kiếm theo title
       const matchSearch =
         task.title
           .toLowerCase()
           .includes(search.toLowerCase());
 
-      // Kiểm tra filter theo status
       const matchStatus =
         statusFilter === "all" ||
         task.status === statusFilter;
 
-      // Task phải thỏa mãn cả 2 điều kiện
       return matchSearch && matchStatus;
     });
-
   }, [
     tasks,
     search,
     statusFilter,
   ]);
 
-
   // ========================================
-  // CREATE
+  // EDIT
   // ========================================
 
-  const addTask = (task: Task) => {
-    setTasks((prev) => [
-      ...prev,
-      task,
-    ]);
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
   };
-
-
-  // ========================================
-  // DELETE
-  // ========================================
-
-  const deleteTask = (id: number) => {
-    setTasks((prev) =>
-      prev.filter(
-        (task) => task.id !== id
-      )
-    );
-  };
-
 
   // ========================================
   // UPDATE
   // ========================================
 
-  const updateTask = (
-    updatedTask: Task
-  ) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === updatedTask.id
-          ? updatedTask
-          : task
-      )
-    );
+  const handleUpdate = (updatedTask: Task) => {
+    updateTask(updatedTask);
+
+    // Đóng form sau khi update
+    setEditingTask(null);
   };
-
-
-  // ========================================
-  // RENDER
-  // ========================================
 
   return (
     <div>
-
       <h1>Tasks</h1>
 
-
-      {/* ================================
-          SEARCH
-      ================================= */}
+      {/* SEARCH */}
 
       <input
         type="text"
@@ -140,26 +87,16 @@ function Tasks() {
         }
       />
 
-
-      {/* ================================
-          ADD TASK
-      ================================= */}
+      {/* ADD */}
 
       <button
         onClick={() => {
-
           const newTask: Task = {
             id: Date.now(),
-
             title: "Công việc mới",
-
-            description:
-              "Mô tả công việc",
-
+            description: "Mô tả công việc",
             status: "todo",
-
             priority: "medium",
-
             createdAt:
               new Date().toISOString(),
           };
@@ -170,10 +107,7 @@ function Tasks() {
         Thêm công việc
       </button>
 
-
-      {/* ================================
-          STATUS FILTER
-      ================================= */}
+      {/* FILTER */}
 
       <select
         value={statusFilter}
@@ -202,17 +136,23 @@ function Tasks() {
         </option>
       </select>
 
+      {/* EDIT FORM */}
 
-      {/* ================================
-          TASK LIST
-      ================================= */}
+      {editingTask && (
+        <TaskForm
+          task={editingTask}
+          onSubmit={handleUpdate}
+          onCancel={() =>
+            setEditingTask(null)
+          }
+        />
+      )}
 
       <TaskList
         tasks={filteredTasks}
         onDelete={deleteTask}
-        onEdit={updateTask}
+        onEdit={handleEdit}
       />
-
     </div>
   );
 }

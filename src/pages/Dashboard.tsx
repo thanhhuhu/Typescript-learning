@@ -1,4 +1,4 @@
-import useTasks from "../hooks/useTask";
+import useTasks from "../hooks/useTasks";
 
 function Dashboard() {
   const { tasks } = useTasks();
@@ -16,28 +16,10 @@ const doneTasks = tasks.filter(
 ).length;
     return (
         <div>
-            <h1>Dashboard</h1>
-
-      <div>
-        <h3>Total Tasks</h3>
-        <p>10</p>
-      </div>
-
-      <div>
-        <h3>Todo</h3>
-        <p>4</p>
-      </div>
-
-      <div>
-        <h3>Doing</h3>
-        <p>3</p>
-      </div>
-
-      <div>
-        <h3>Done</h3>
-        <p>3</p>
-      </div>
-
+          <p>{totalTasks}</p>
+          <p>{todoTasks}</p>
+          <p>{doingTasks}</p>
+          <p>{doneTasks}</p>
         </div>
     )
 }

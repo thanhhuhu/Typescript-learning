@@ -7,11 +7,11 @@ function Sidebar () {
                 <Link to ="/dashboard">
                     Dashboard
                 </Link>
-                <Link to ="/dashboard">
-                    Dashboard
+                <Link to ="/tasks">
+                    Tasks
                 </Link>
-                <Link to ="/dashboard">
-                    Dashboard
+                <Link to ="/profile">
+                    Profile
                 </Link>
             </nav>
         </aside>
